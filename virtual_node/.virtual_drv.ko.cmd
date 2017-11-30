@@ -1,1 +1,0 @@
-cmd_/home/elinux/Elinux_driver/virtual_node/virtual_drv.ko := arm-linux-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/elinux/Elinux_driver/virtual_node/virtual_drv.ko /home/elinux/Elinux_driver/virtual_node/virtual_drv.o /home/elinux/Elinux_driver/virtual_node/virtual_drv.mod.o
