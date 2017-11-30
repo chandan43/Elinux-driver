@@ -1,0 +1,107 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ChipCmd	spi_flash.c	/^enum ChipCmd {$/;"	g	file:
+ChipCmd	spi_flash_kobj_skel.c	/^enum ChipCmd {$/;"	g	file:
+INSTw25id	spi_flash.c	/^enum INSTw25id {$/;"	g	file:
+INSTw25id	spi_flash_kobj_skel.c	/^enum INSTw25id {$/;"	g	file:
+IO_LIMIT	spi_flash.c	13;"	d	file:
+IO_LIMIT	spi_flash_kobj_skel.c	10;"	d	file:
+KDIR	Makefile	/^KDIR =  \/home\/elinux\/linux-4.4.96$/;"	m
+PWD	Makefile	/^PWD := $(shell pwd)$/;"	m
+StausReg	spi_flash.c	/^enum StausReg {$/;"	g	file:
+StausReg	spi_flash_kobj_skel.c	/^enum StausReg {$/;"	g	file:
+StausVal	spi_flash.c	/^enum StausVal {$/;"	g	file:
+StausVal	spi_flash_kobj_skel.c	/^enum StausVal {$/;"	g	file:
+W25_MAXADDRLEN	spi_flash.c	11;"	d	file:
+W25_MAXADDRLEN	spi_flash_kobj_skel.c	8;"	d	file:
+W25_MNid	spi_flash.c	/^	W25_MNid     =  0xEF,    \/*Manufacturer id *\/$/;"	e	enum:INSTw25id	file:
+W25_MNid	spi_flash_kobj_skel.c	/^	W25_MNid     =  0xEF,    \/*Manufacturer id *\/$/;"	e	enum:INSTw25id	file:
+W25_Notrdy	spi_flash.c	/^	W25_Notrdy   = 0x01,   \/* nRDY = write-in-progres pg.17  *\/$/;"	e	enum:StausVal	file:
+W25_NotrdySR	spi_flash_kobj_skel.c	/^	W25_NotrdySR   = 0x01,   \/* nRDY = write-in-progres pg.17  *\/$/;"	e	enum:StausVal	file:
+W25_Read	spi_flash.c	/^	W25_Read     = 0x03,   \/* read byte(s) *\/$/;"	e	enum:ChipCmd	file:
+W25_Read	spi_flash_kobj_skel.c	/^	W25_Read     = 0x03,   \/* read byte(s) *\/$/;"	e	enum:ChipCmd	file:
+W25_ReadSR	spi_flash.c	/^	W25_ReadSR     = 0x05,   \/* read status register *\/$/;"	e	enum:StausReg	file:
+W25_ReadSR	spi_flash_kobj_skel.c	/^	W25_ReadSR     = 0x05,   \/* read status register *\/$/;"	e	enum:StausReg	file:
+W25_Readid	spi_flash.c	/^	W25_Readid   =  0x9F,    \/*read Manufacturer id  :*\/$/;"	e	enum:INSTw25id	file:
+W25_Readid	spi_flash_kobj_skel.c	/^	W25_Readid   =  0x9F,    \/*read Manufacturer id  :*\/$/;"	e	enum:INSTw25id	file:
+W25_SecErase	spi_flash.c	/^	W25_SecErase = 0x20,    \/*Erase sector*\/$/;"	e	enum:ChipCmd	file:
+W25_SecErase	spi_flash_kobj_skel.c	/^	W25_SecErase = 0x20,    \/*Erase sector*\/$/;"	e	enum:ChipCmd	file:
+W25_TIMEOUT	spi_flash.c	12;"	d	file:
+W25_TIMEOUT	spi_flash_kobj_skel.c	9;"	d	file:
+W25_Write	spi_flash.c	/^	W25_Write    = 0x02,   \/* write byte(s)\/sector *\/$/;"	e	enum:ChipCmd	file:
+W25_Write	spi_flash_kobj_skel.c	/^	W25_Write    = 0x02,   \/* write byte(s)\/sector *\/$/;"	e	enum:ChipCmd	file:
+W25_WriteDis	spi_flash.c	/^	W25_WriteDis = 0x04,   \/* reset the write enablei i.e write Disable *\/$/;"	e	enum:ChipCmd	file:
+W25_WriteDis	spi_flash_kobj_skel.c	/^	W25_WriteDis = 0x04,   \/* reset the write enablei i.e write Disable *\/$/;"	e	enum:ChipCmd	file:
+W25_WriteEn	spi_flash.c	/^	W25_WriteEn  = 0x06,   \/* latch the write enable *\/$/;"	e	enum:ChipCmd	file:
+W25_WriteEn	spi_flash_kobj_skel.c	/^	W25_WriteEn  = 0x06,   \/* latch the write enable *\/$/;"	e	enum:ChipCmd	file:
+W25_WriteSR	spi_flash.c	/^	W25_WriteSR    = 0x01,   \/* write status register *\/$/;"	e	enum:StausReg	file:
+W25_WriteSR	spi_flash_kobj_skel.c	/^	W25_WriteSR    = 0x01,   \/* write status register *\/$/;"	e	enum:StausReg	file:
+W25_Write_En	spi_flash.c	/^	W25_Write_En = 0x02,   \/* write enable (latched) *\/$/;"	e	enum:StausVal	file:
+W25_Write_EnSR	spi_flash_kobj_skel.c	/^	W25_Write_EnSR = 0x02,   \/* write enable (latched) *\/$/;"	e	enum:StausVal	file:
+__this_module	spi_flash.mod.c	/^__visible struct module __this_module$/;"	v	typeref:struct:module
+__used	spi_flash.mod.c	/^__used$/;"	v	file:
+__used	spi_flash.mod.c	/^__used$/;"	v	typeref:struct:____versions	file:
+address_width	spi_flash.c	/^	unsigned 		address_width;$/;"	m	struct:w25_priv	file:
+address_width	spi_flash_kobj_skel.c	/^	unsigned 		address_width;$/;"	m	struct:w25_priv	file:
+attr_group	spi_flash.c	/^static const struct attribute_group attr_group = {$/;"	v	typeref:struct:attribute_group	file:
+attr_group	spi_flash_kobj_skel.c	/^static const struct attribute_group attr_group = {$/;"	v	typeref:struct:attribute_group	file:
+attrs	spi_flash.c	/^static struct attribute *attrs[] = {$/;"	v	typeref:struct:attribute	file:
+attrs	spi_flash_kobj_skel.c	/^static struct attribute *attrs[] = {$/;"	v	typeref:struct:attribute	file:
+block	spi_flash.c	/^	unsigned                block;$/;"	m	struct:w25_priv	file:
+block	spi_flash_kobj_skel.c	/^	unsigned                block;$/;"	m	struct:w25_priv	file:
+kobj	spi_flash.c	/^	struct 			kobject *kobj;$/;"	m	struct:w25_priv	typeref:struct:w25_priv::kobject	file:
+kobj	spi_flash_kobj_skel.c	/^	struct 			kobject *kobj;$/;"	m	struct:w25_priv	typeref:struct:w25_priv::kobject	file:
+name	spi_flash.c	/^	char 			name[15];$/;"	m	struct:w25_priv	file:
+name	spi_flash_kobj_skel.c	/^	char 			name[15];$/;"	m	struct:w25_priv	file:
+obj-m	Makefile	/^obj-m := spi_flash.o$/;"	m
+offset	spi_flash.c	/^	long int 		offset;$/;"	m	struct:w25_priv	file:
+offset	spi_flash_kobj_skel.c	/^	long int 		offset;$/;"	m	struct:w25_priv	file:
+page	spi_flash.c	/^	unsigned                page;$/;"	m	struct:w25_priv	file:
+page	spi_flash_kobj_skel.c	/^	unsigned                page;$/;"	m	struct:w25_priv	file:
+page_size	spi_flash.c	/^	unsigned 		page_size;$/;"	m	struct:w25_priv	file:
+page_size	spi_flash_kobj_skel.c	/^	unsigned 		page_size;$/;"	m	struct:w25_priv	file:
+prv	spi_flash.c	/^struct w25_priv *prv = NULL;$/;"	v	typeref:struct:w25_priv
+prv	spi_flash_kobj_skel.c	/^struct w25_priv *prv = NULL;$/;"	v	typeref:struct:w25_priv
+sector	spi_flash.c	/^	unsigned                sector;$/;"	m	struct:w25_priv	file:
+sector	spi_flash_kobj_skel.c	/^	unsigned                sector;$/;"	m	struct:w25_priv	file:
+size	spi_flash.c	/^	unsigned 		size;$/;"	m	struct:w25_priv	file:
+size	spi_flash_kobj_skel.c	/^	unsigned 		size;$/;"	m	struct:w25_priv	file:
+spi	spi_flash.c	/^	struct 			spi_device *spi;$/;"	m	struct:w25_priv	typeref:struct:w25_priv::spi_device	file:
+spi	spi_flash_kobj_skel.c	/^	struct 			spi_device *spi;$/;"	m	struct:w25_priv	typeref:struct:w25_priv::spi_device	file:
+spi_w25flash_driver	spi_flash.c	/^module_spi_driver(spi_w25flash_driver);$/;"	v
+spi_w25flash_driver	spi_flash.c	/^static struct spi_driver spi_w25flash_driver = {$/;"	v	typeref:struct:spi_driver	file:
+spi_w25flash_driver	spi_flash_kobj_skel.c	/^module_spi_driver(spi_w25flash_driver);$/;"	v
+spi_w25flash_driver	spi_flash_kobj_skel.c	/^static struct spi_driver spi_w25flash_driver = {$/;"	v	typeref:struct:spi_driver	file:
+spi_w25flash_driver	spi_flash_skel.c	/^module_spi_driver(spi_w25flash_driver);$/;"	v
+spi_w25flash_driver	spi_flash_skel.c	/^static struct spi_driver spi_w25flash_driver = {$/;"	v	typeref:struct:spi_driver	file:
+spi_w25flash_of_match	spi_flash.c	/^static const struct of_device_id spi_w25flash_of_match[]= {$/;"	v	typeref:struct:of_device_id	file:
+spi_w25flash_of_match	spi_flash_kobj_skel.c	/^static const struct of_device_id spi_w25flash_of_match[]= {$/;"	v	typeref:struct:of_device_id	file:
+spi_w25flash_of_match	spi_flash_skel.c	/^static const struct of_device_id spi_w25flash_of_match[]= {$/;"	v	typeref:struct:of_device_id	file:
+spi_w25flash_probe	spi_flash.c	/^static int spi_w25flash_probe(struct spi_device *spi)$/;"	f	file:
+spi_w25flash_probe	spi_flash_kobj_skel.c	/^static int spi_w25flash_probe(struct spi_device *spi)$/;"	f	file:
+spi_w25flash_probe	spi_flash_skel.c	/^static int spi_w25flash_probe(struct spi_device *spi)$/;"	f	file:
+spi_w25flash_remove	spi_flash.c	/^static int spi_w25flash_remove(struct spi_device *spi)$/;"	f	file:
+spi_w25flash_remove	spi_flash_kobj_skel.c	/^static int spi_w25flash_remove(struct spi_device *spi)$/;"	f	file:
+spi_w25flash_remove	spi_flash_skel.c	/^static int spi_w25flash_remove(struct spi_device *spi)$/;"	f	file:
+w25_dt_to_chip	spi_flash.c	/^static void w25_dt_to_chip(struct device *dev)$/;"	f	file:
+w25_dt_to_chip	spi_flash_kobj_skel.c	/^static void w25_dt_to_chip(struct device *dev)$/;"	f	file:
+w25_flash_read	spi_flash.c	/^static ssize_t w25_flash_read(struct w25_priv *w25, char *buf, unsigned offset, $/;"	f	file:
+w25_flash_write	spi_flash.c	/^static ssize_t w25_flash_write(struct w25_priv *w25, const char *buf, $/;"	f	file:
+w25_get_offset	spi_flash.c	/^static ssize_t w25_get_offset(struct kobject *kobj, $/;"	f	file:
+w25_get_offset	spi_flash_kobj_skel.c	/^static ssize_t w25_get_offset(struct kobject *kobj, $/;"	f	file:
+w25_offset	spi_flash.c	/^static struct kobj_attribute w25_offset =$/;"	v	typeref:struct:kobj_attribute	file:
+w25_offset	spi_flash_kobj_skel.c	/^static struct kobj_attribute w25_offset =$/;"	v	typeref:struct:kobj_attribute	file:
+w25_priv	spi_flash.c	/^struct w25_priv {$/;"	s	file:
+w25_priv	spi_flash_kobj_skel.c	/^struct w25_priv {$/;"	s	file:
+w25_rw	spi_flash.c	/^static struct kobj_attribute w25_rw =$/;"	v	typeref:struct:kobj_attribute	file:
+w25_rw	spi_flash_kobj_skel.c	/^static struct kobj_attribute w25_rw =$/;"	v	typeref:struct:kobj_attribute	file:
+w25_set_offset	spi_flash.c	/^static ssize_t w25_set_offset(struct kobject *kobj, struct kobj_attribute *attr, $/;"	f	file:
+w25_set_offset	spi_flash_kobj_skel.c	/^static ssize_t w25_set_offset(struct kobject *kobj, struct kobj_attribute *attr, $/;"	f	file:
+w25_sys_read	spi_flash.c	/^static ssize_t w25_sys_read(struct kobject *kobj, struct kobj_attribute *attr,$/;"	f	file:
+w25_sys_read	spi_flash_kobj_skel.c	/^static ssize_t w25_sys_read(struct kobject *kobj, struct kobj_attribute *attr,$/;"	f	file:
+w25_sys_write	spi_flash.c	/^static ssize_t w25_sys_write(struct kobject *kobj, struct kobj_attribute *attr,$/;"	f	file:
+w25_sys_write	spi_flash_kobj_skel.c	/^static ssize_t w25_sys_write(struct kobject *kobj, struct kobj_attribute *attr,$/;"	f	file:

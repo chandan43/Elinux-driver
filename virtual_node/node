@@ -1,0 +1,7 @@
+/ {
+	my_vdev@4800a000 {
+		compatible = "ti,techved-vDev";
+		reg = <0x4800a000 0x1000>; /*4KB=4096=0x1000*/
+		status = "okay";
+	};
+};

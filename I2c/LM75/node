@@ -1,0 +1,10 @@
+&i2c2 {
+        status = "okay";
+
+        /*Node for lm75b temperature sensor*/
+        at24_eeprom: lm75@48 {
+                compatible = "lm75";
+                reg = <0x48>;
+        };
+};
+

@@ -1,0 +1,1 @@
+cmd_/home/elinux/Elinux_driver/I2c/ADXL345/adxl345.ko := arm-linux-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/elinux/Elinux_driver/I2c/ADXL345/adxl345.ko /home/elinux/Elinux_driver/I2c/ADXL345/adxl345.o /home/elinux/Elinux_driver/I2c/ADXL345/adxl345.mod.o
