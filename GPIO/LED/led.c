@@ -81,7 +81,7 @@ static ssize_t led_write(struct kobject *kobj, struct kobj_attribute *attr, cons
 		data = data | (1U << gpbank->pinno);
 		writel_relaxed(data, gbank_base + OMAP_GPIO_CLEARDATAOUT);
 	}else{
-		pr_info("%s: led is off\n",__func__);
+		pr_info("%s: led is on\n",__func__);
 		data = data | (1U << gpbank->pinno);
 		writel_relaxed(data, gbank_base + OMAP_GPIO_SETDATAOUT);
 	}

@@ -1,0 +1,14 @@
+&spi0 {
+        status = "okay";
+
+        /*DT node for w25q32 spi flash chip*/
+        en25t80: en25t80@0 {
+                compatible = "EON,EN25T80";
+                spi-max-frequency = <50000>;
+                reg = <0x0>;
+                size = <1048576>;       /*1 MBytes*/  
+                pagesize = <256>;
+                address-width = <20>;   /*In bits*/
+        };
+};
+
