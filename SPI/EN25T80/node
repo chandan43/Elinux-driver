@@ -1,12 +1,25 @@
+
+am33xx_pinmux {
+            spi0_pins_s0: spi0_pins_s0 {
+                pinctrl-single,pins = <
+                  0x150 0x30  /* spi0_sclk, INPUT_PULLUP | MODE0 */
+                  0x154 0x30  /* spi0_d0, INPUT_PULLUP | MODE0 */
+                  0x158 0x10  /* spi0_d1, OUTPUT_PULLUP | MODE0 */
+                  0x15c 0x10  /* spi0_cs0, OUTPUT_PULLUP | MODE0 */
+                >;
+            };
+};
+
 &spi0 {
         status = "okay";
-
+        pinctrl-names = "default";
+        pinctrl-0 = <&spi0_pins_s0>;
         /*DT node for en25t80 spi flash chip*/
-        en25t80: en25t80@0 {
+        en25t80:  en25t80@0 {
                 compatible = "EON,EN25T80";
                 spi-max-frequency = <50000>;
                 reg = <0x0>;
-                size = <1048576>;       /*1 MBytes*/  
+                size = <1048576>;       /*1 MBytes*/
                 pagesize = <256>;
                 address-width = <20>;   /*In bits*/
         };

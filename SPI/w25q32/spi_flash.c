@@ -160,7 +160,7 @@ static ssize_t w25_flash_write(struct w25_priv *w25, const char *buf,
 		return status;
 	}
 	/*Shifting due to address bus is 24 bits so coping to local buff only  8 bits using shifting*/
-	tmp[0] = (u8)W25_WriteEn;
+	tmp[0] = (u8)W25_Write_En;
 	tmp[1] = off >> 16;
 	tmp[2] = off >> 8;
 	tmp[3] = off >>0;

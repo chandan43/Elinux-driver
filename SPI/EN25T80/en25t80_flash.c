@@ -14,7 +14,7 @@
 
 enum INSTw25id {
 	EN25_Readid   =  0x9F,    /*read Manufacturer id  :*/
-	EN25_MNid     =  0x90,    /*Manufacturer id */
+	EN25_MNid     =  0x1C,    /*Manufacturer id */
 };
 
 enum StausReg {
@@ -160,7 +160,7 @@ static ssize_t en25_flash_write(struct en25t80_priv *en25, const char *buf,
 		return status;
 	}
 	/*Shifting due to address bus is 24 bits so coping to local buff only  8 bits using shifting*/
-	tmp[0] = (u8)EN25_WriteEn;
+	tmp[0] = (u8)EN25_Write;
 	tmp[1] = off >> 16;
 	tmp[2] = off >> 8;
 	tmp[3] = off >>0;
@@ -278,7 +278,7 @@ static ssize_t en25_get_offset(struct kobject *kobj,
 
 
 static struct kobj_attribute en25_rw =
-		__ATTR(w25q32, 0660, eb25_sys_read, en25_sys_write);
+		__ATTR(en25q32, 0660, eb25_sys_read, en25_sys_write);
 static struct kobj_attribute en25_offset =
 		__ATTR(offset, 0660, en25_get_offset, en25_set_offset);
 
