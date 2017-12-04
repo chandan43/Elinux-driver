@@ -14,7 +14,7 @@
 
 enum INSTw25id {
 	EN25_Readid   =  0x9F,    /*read Manufacturer id  :*/
-	EN25_MNid     =  0x90h,    /*Manufacturer id */
+	EN25_MNid     =  0x90,    /*Manufacturer id */
 };
 
 enum StausReg {
