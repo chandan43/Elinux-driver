@@ -42,23 +42,19 @@ static unsigned adxl345_timeout = 25; /*default timeout for normal I2c  devices 
    the SMBus standard. */
 static int adxl345_read_value(struct spi_device *spi, u8 reg)
 {
-//	unsigned char *data = reg | 0x80;
-	//return spi_write_then_read(spi, data, 1, data, 1);
-	return spi_w8r8(spi,(reg | 0x80));
+	reg= 0x80 | reg;
+	return spi_w8r8(spi,reg);
 }
 
-static int adxl345_write_value(struct spi_device *spi, u8 reg,u16 value)
+static int adxl345_write_value(struct spi_device *spi, u8 reg,u8 value)
 {
 	unsigned char buf[2];
  
-	buf[0] = reg & 0x7F;
-	//buf[0] = reg;
+	buf[0] = reg & 0x7f;
 	buf[1] = value;
  
 	return spi_write_then_read(spi, buf, 2, NULL, 0);
 }
-
-
 
 static ssize_t 
 x_read(struct kobject *kobj, struct kobj_attribute *attr,char *buf)
@@ -173,6 +169,10 @@ static int adxl345_probe(struct spi_device *spi)
 		return -ENOMEM;
 	}
 	prv->spi=spi;
+	pr_info("SPI CLK %d Hz \n", spi->max_speed_hz);
+	pr_info("bits_per_word:  %d \n", spi->bits_per_word);
+	pr_info("MODE %d Hz \n", spi->mode);
+
 	devid = adxl345_read_value(spi, DEVID); 
 	/* The Device ID of the ADXL345 is 0xE5, which is 229 in decimal, This should be print. */
 	pr_info("DEVID: Device id is %02x\n",devid);
@@ -204,7 +204,7 @@ static int adxl345_probe(struct spi_device *spi)
 	/*Reset*/
 	set_mask=0;
 	new=0;
-	set_mask = (1 << 3) | (0 << 6); //Selecting 4 wire config
+	set_mask = (1 << 3);  //Selecting 4 wire config
 	/* configure as specified */
 	status = adxl345_read_value(spi,DATA_FORMAT);
 	if (status < 0) 
@@ -213,6 +213,8 @@ static int adxl345_probe(struct spi_device *spi)
 	new = status | set_mask ;
 	adxl345_write_value(spi, DATA_FORMAT, new);
 	dev_dbg(&spi->dev, "DATA_FORMAT Config %02x\n", new);
+	
+	
 	
 	prv->adxl345_kobj=kobject_create_and_add("adxl345", NULL);
 	if(!prv->adxl345_kobj)
