@@ -1,0 +1,10 @@
+&i2c2 {
+        status = "okay";
+
+        /*Node for DS3231 RTC (Real time clock)*/
+        DS3231_rtc: ds3231@68 {
+                compatible = "adxl345";
+                reg = <0x68>;
+        };
+};
+
