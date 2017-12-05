@@ -19,9 +19,10 @@ struct adxl345_prv *prv=NULL;
 
 /* The adxl345 Config registers */
 enum ADXL345_Reg {
-	BW_RATE		= 0x2C, 	//Bandwidth rate register(0x2C) : Data rate and power mode control.
-	POWER_CTL	= 0x2D,		//Power-saving features control.Power control register
-	DATA_FORMAT	= 0x31, 	//Select Data format register(0x31): Data format control.
+	BW_RATE		= 0x2C, 	// Bandwidth rate register(0x2C) : Data rate and power mode control.
+	POWER_CTL	= 0x2D,		// Power-saving features control.Power control register
+	DATA_FORMAT	= 0x31, 	// Select Data format register(0x31): Data format control.
+	DEVID		= 0x00,		// Device ID.
 };
 
 enum Axis_reg {
@@ -43,7 +44,7 @@ static int adxl345_read_value(struct spi_device *spi, u8 reg)
 {
 //	unsigned char *data = reg | 0x80;
 	//return spi_write_then_read(spi, data, 1, data, 1);
-	return spi_w8r8(spi,(reg| 0x80));
+	return spi_w8r8(spi,(reg | 0x80));
 }
 
 static int adxl345_write_value(struct spi_device *spi, u8 reg,u16 value)
@@ -156,14 +157,14 @@ static struct attribute *attrs[] = {
 static struct attribute_group attr_group = {
         .attrs = attrs,
 };
-//1.BW_RATE	: Set MODE		= 0x0A,   :00001010      //Normal mode, Output data rate = 100 Hz(0x0A)
+//1.BW_RATE	: Set MODE		= 0x0A,   :00001010     //Normal mode, Output data rate = 100 Hz(0x0A)
 //2.POWER_CTL	: Set AUTO_SLEEP	= 0x08,   :00001000	//Auto-sleep disable
 //3.DATA_FORMAT: Set SELF_TEST		= 0x08,	  :00001000	//Self test disabled, 4-wire interface, Full resolution, range = +/-2g(0x08)
 
 static int adxl345_probe(struct spi_device *spi)
 {
 	int ret,new;
-	u8 set_mask;
+	u8 set_mask,devid;
 	int status;
 	pr_info("%s: Device adxl345 probed......\n",__func__);	
 	prv=(struct adxl345_prv *)kzalloc(sizeof(struct adxl345_prv), GFP_KERNEL);		
@@ -172,6 +173,9 @@ static int adxl345_probe(struct spi_device *spi)
 		return -ENOMEM;
 	}
 	prv->spi=spi;
+	devid = adxl345_read_value(spi, DEVID); 
+	/* The Device ID of the ADXL345 is 0xE5, which is 229 in decimal, This should be print. */
+	pr_info("DEVID: Device id is %02x\n",devid);
 	/* device driver data */
 	spi_set_drvdata(spi, prv);
 	set_mask = (1 << 1) | (1 << 3);
