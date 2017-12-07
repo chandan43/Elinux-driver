@@ -22,6 +22,9 @@
 #include <linux/delay.h>
 
 
+/*BMP180_coeff_reg */ 
+static int AC1,AC2,AC3,AC4,AC5,AC6,B1,B2,MB,MC,MD;
+
 struct bmp180_prv {
 	struct i2c_client client_prv;
 	struct kobject *bmp180_kobj;
@@ -33,19 +36,6 @@ struct bmp180_prv *prv=NULL;
 /* The BMP180  registers */
 enum BMP180_Reg {
 	BMP180_CTR      = 0xF4, 	//measurement control register
-};
-enum BMP180_coeff_reg {
-	AC1 = 0;
-	AC2 
-	AC3 
-	AC4 
-	AC5 
-	AC6 
-	B1 
-	B2 
-	MB 
-	MC 
-	MD 
 };
 
 enum BMP180_coeff_reg_MSB {
@@ -91,9 +81,15 @@ enum Data_reg{
 static unsigned bmp180_timeout = 25; /*default timeout for normal I2c  devices */
 /* register access */
 
-/* All registers are word-sized, except for the configuration register.
-   LM75 uses a high-byte first convention, which is exactly opposite to
-   the SMBus standard. */
+static int power(int param1, unsigned int param2)
+{
+    if (param2 == 0)
+        return 1;
+    else if (param2%2 == 0)
+        return power(param1, param2/2) * power(param1, param2/2);
+    else
+        return param1 * power(param1, param2/2) * power(param1, param2/2);
+}
 static int bmp180_read_value(struct i2c_client *client, u8 reg)
 {
 	return i2c_smbus_read_byte_data(client, reg);
@@ -124,7 +120,7 @@ static int get_temp_value(struct i2c_client *client )
 	long temp;
 	unsigned long timeout, read_time;
 	/* Enable temperature */
-	bmp180_write_value(BMP180_CTR,En_Temp_M);
+	bmp180_write_value(&prv->client_prv,BMP180_CTR,En_Temp_M);
 	timeout = jiffies + msecs_to_jiffies(bmp180_timeout);
 	do{
 		read_time = jiffies;
@@ -138,7 +134,6 @@ static int get_temp_value(struct i2c_client *client )
 		}
 		msleep(1);
 	}while (time_before(read_time, timeout));
-	
 	return -ETIMEDOUT;
 }
 static int get_pressure_value(struct i2c_client *client )
@@ -147,7 +142,7 @@ static int get_pressure_value(struct i2c_client *client )
 	long pressure;
 	unsigned long timeout, read_time;
 	/* Enable pressure measurement, OSS = 1(0x74) */
-	bmp180_write_value(BMP180_CTR,En_Pres_M_1);
+	bmp180_write_value(&prv->client_prv,BMP180_CTR,En_Pres_M_1);
 	timeout = jiffies + msecs_to_jiffies(bmp180_timeout);
 	do{
 		read_time = jiffies;
@@ -162,15 +157,13 @@ static int get_pressure_value(struct i2c_client *client )
 		}
 		msleep(1);
 	}while (time_before(read_time, timeout));
-	
 	return -ETIMEDOUT;
 }
 static ssize_t bmp180_get_pressure(struct kobject *kobj, 
 				struct kobj_attribute *attr,char *buf)
 {
-	long temp,pressure,pressure1,altitude;
-	long X1,X2,X3,B3,B4,B5,B7,cTemp,fTemp;
-	unsigned long timeout, read_time;
+	long temp,pressure,pressure1,altitude,pres;
+	long X1,X2,X3,B3,B4,B5,B6,B7,cTemp,fTemp;
 	/* Calibration Cofficients stored in EEPROM of the device 
 	 * Read 22 bytes of data from address 0xAA(170) */
 	get_Calibration_coeff(&prv->client_prv);
@@ -194,7 +187,7 @@ static ssize_t bmp180_get_pressure(struct kobject *kobj,
 	B4 = AC4 * (X3 + 32768) / 32768.0;
  	B7 = ((pres - B3) * (25000.0));
 	pressure = 0.0;
-	if(B7 < 2147483648L){
+	if(B7 < 2147483648LL){
 		pressure = (B7 * 2) / B4;
 	}else {
 		pressure = (B7 / B4) * 2;
@@ -204,16 +197,15 @@ static ssize_t bmp180_get_pressure(struct kobject *kobj,
 	X2 = ((-7357) * pressure) / 65536.0;
 	pressure1 = (pressure + (X1 + X2 + 3791) / 16.0) / 100;
 	// Calculate Altitude
-	altitude = 44330 * (1 - pow(pressure1/1013.25, 0.1903));
+	altitude = 44330 * (1 - power(pressure1/1013.25, 0.1903));
 	return sprintf(buf, "Pressure : %ld\n",pressure1);
 }
 
 static ssize_t bmp180_get_altitude(struct kobject *kobj, 
 					struct kobj_attribute *attr,char *buf)
 {
-	long temp,pressure,pressure1,altitude;
-	long X1,X2,X3,B3,B4,B5,B7,cTemp,fTemp;
-	unsigned long timeout, read_time;
+	long temp,pressure,pressure1,altitude,pres;
+	long X1,X2,X3,B3,B4,B5,B6,B7,cTemp,fTemp;
 	/* Calibration Cofficients stored in EEPROM of the device 
 	 * Read 22 bytes of data from address 0xAA(170) */
 	get_Calibration_coeff(&prv->client_prv);
@@ -237,7 +229,7 @@ static ssize_t bmp180_get_altitude(struct kobject *kobj,
 	B4 = AC4 * (X3 + 32768) / 32768.0;
  	B7 = ((pres - B3) * (25000.0));
 	pressure = 0.0;
-	if(B7 < 2147483648L){
+	if(B7 < 2147483648LL){
 		pressure = (B7 * 2) / B4;
 	}else {
 		pressure = (B7 / B4) * 2;
@@ -247,7 +239,7 @@ static ssize_t bmp180_get_altitude(struct kobject *kobj,
 	X2 = ((-7357) * pressure) / 65536.0;
 	pressure1 = (pressure + (X1 + X2 + 3791) / 16.0) / 100;
 	// Calculate Altitude
-	altitude = 44330 * (1 - pow(pressure1/1013.25, 0.1903));
+	altitude = 44330 * (1 - power(pressure1/1013.25, 0.1903));
 	return sprintf(buf, "Pressure : %ld\n",altitude);
 }
 static ssize_t bmp180_get_cTemp(struct kobject *kobj, 
@@ -255,7 +247,6 @@ static ssize_t bmp180_get_cTemp(struct kobject *kobj,
 {
 	long temp;
 	long X1,X2,B5,cTemp,fTemp;
-	unsigned long timeout, read_time;
 	/* Calibration Cofficients stored in EEPROM of the device 
 	 * Read 22 bytes of data from address 0xAA(170) */
 	get_Calibration_coeff(&prv->client_prv);
@@ -268,15 +259,13 @@ static ssize_t bmp180_get_cTemp(struct kobject *kobj,
 	fTemp = cTemp * 1.8 + 32;
 	return sprintf(buf, "Temperature in Celsius : %ld\n",cTemp);
 }
-}
 static ssize_t bmp180_get_fTemp(struct kobject *kobj, 
 				struct kobj_attribute *attr,char *buf)
 {
 	long temp;
 	long X1,X2,B5,cTemp,fTemp;
-	unsigned long timeout, read_time;
-	/* Calibration Cofficients stored in EEPROM of the device 
-	 * Read 22 bytes of data from address 0xAA(170) */
+	/* Calibration Cofficients stored in EEPROM of the devicei*/ 
+	 /* Read 22 bytes of data from address 0xAA(170) */
 	get_Calibration_coeff(&prv->client_prv);
 	/* Callibration for Temperature */
 	temp=get_temp_value(&prv->client_prv);
@@ -308,8 +297,7 @@ static struct attribute_group attr_group = {
 static int bmp180_probe(struct i2c_client *client, 
 				const struct i2c_device_id *id)
 {
-	int ret,new;
-	int status;
+	int ret;
 	pr_info("%s: Device bmp180 probed......\n",__func__);	
 	prv=(struct bmp180_prv *)kzalloc(sizeof(struct bmp180_prv), GFP_KERNEL);		
 	if(!prv){
@@ -317,9 +305,6 @@ static int bmp180_probe(struct i2c_client *client,
 		return -ENOMEM;
 	}
 	prv->client_prv = *client;
-	/* Calibration Cofficients stored in EEPROM of the device 
-	 * Read 22 bytes of data from address 0xAA(170) */
-	get_Calibration_coeff(client);
 	
 	prv->bmp180_kobj=kobject_create_and_add("bmp180", NULL);
 	if(!prv->bmp180_kobj)

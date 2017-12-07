@@ -1,7 +1,6 @@
 obj-m := bmp180.o
 
-#KDIR =  /home/elinux/linux-4.4.96
-KDIR =  /usr/src/kernels/linux-4.4.76
+KDIR =  /home/elinux/linux-4.4.96
 
 PWD := $(shell pwd)
 
