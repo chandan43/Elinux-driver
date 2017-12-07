@@ -1,0 +1,10 @@
+&i2c2 {
+        status = "okay";
+
+        /*Node for adxl345 Digital Accelerometer*/
+        adxl345_acc: adxl345@53 {
+                compatible = "adxl345";
+                reg = <0x53>;
+        };
+};
+
