@@ -1,10 +1,10 @@
 &i2c2 {
         status = "okay";
 
-        /*Node for adxl345 Digital Accelerometer*/
-        adxl345_acc: adxl345@53 {
-                compatible = "adxl345";
-                reg = <0x53>;
+        /*Node for bmp180 pressure sensor*/
+        bmp180_pressure : bmp180@77 {
+                compatible = "bmp180";
+                reg = <0x77>;
         };
 };
 
