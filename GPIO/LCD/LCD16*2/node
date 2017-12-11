@@ -1,0 +1,19 @@
+/ {
+	my_vdev@4800a000 {
+		compatible = "ti,techved-vDev";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0x4800a000 0x1000>; /*4KB=4096=0x1000*/
+		status = "okay";
+	};
+
+	extled {
+                compatible = "gpio-lcd";
+                gpios = <&gpio0 26 GPIO_ACTIVE_LOW>, // LCD_DB6: P8_14 (GPIO pin 26)
+			<&gpio1 12 GPIO_ACTIVE_LOW>, // LCD_DB7: P8_12 (GPIO pin 44)
+			<&gpio1 14 GPIO_ACTIVE_LOW>, // LCD_DB5: P8_16 (GPIO pin 46)
+			<&gpio2 1 GPIO_ACTIVE_LOW>,  // LCD_DB4: P8_18 (GPIO pin 65)
+			<&gpio2 3 GPIO_ACTIVE_LOW>,  // LCD_RS: P8_8  (GPIO pin 67)
+			<&gpio2 4 GPIO_ACTIVE_LOW>;  // LCD_E:  P8_10 (GPIO pin 68)
+        };
+};
