@@ -17,6 +17,10 @@
 #define STROBE_EN_DELAY 		1		// nanosegundos
 #define CLEAR_DELAY 			1		//
 #define COMMAND_INIT_DELAY 		1		// ms
+#define DRV_VERSION "0.1"
+
+/*Flag for backlight */
+static u8 backlightFlag = 0x01; // Flag de in
 
 /*LCD Commands: Follow HD44780.pdf page 23 onward*/
 enum LCD_Commands {
@@ -76,8 +80,6 @@ struct I2c_LCD_prv {
 };
 
 struct I2c_LCD_prv *prv=NULL;
-#define DRV_VERSION ".1"
-
 
 /* register access */
 
@@ -106,10 +108,10 @@ static void lcd_en_strobe(struct i2c_client *client, int msdelay)
 {
   	int ret = 0;
   	lcd_data = lcd_i2c_read_byte(client);
-  	lcd_data = (lcd_data | LCD_EN | LCD_BL);  
+  	lcd_data = (lcd_data | LCD_EN | (backlightFlag == 1 ? LCD_BL : 0x00));  
   	ret = lcd_i2c_write_byte(client, &lcd_data);
   	ndelay(msdelay);	
-  	lcd_data &= LCD_MASK_DISABLE_EN | LCD_BL; 
+  	lcd_data &= LCD_MASK_DISABLE_EN | (backlightFlag == 1 ? LCD_BL : 0x00); 
   	ret = lcd_i2c_write_byte(client, &lcd_data);
 }
 
@@ -119,10 +121,10 @@ static int lcd_send_cmd(struct i2c_client *client, u8 cmd, int msdelay)
   	int ret = 0;
   	mutex_lock(&lcd16x2_mutex);
   	lcd_data = cmd;
-  	d = (cmd & 0xF0) | LCD_BL;
+  	d = (cmd & 0xF0) | (backlightFlag == 1 ? LCD_BL : 0x00);
   	lcd_i2c_write_byte(client, &d);
   	lcd_en_strobe(client, STROBE_EN_DELAY);
-  	d = (cmd << 4) | LCD_BL ;
+  	d = (cmd << 4) | (backlightFlag == 1 ? LCD_BL : 0x00);
   	lcd_i2c_write_byte(client, &d);
   	lcd_en_strobe(client, STROBE_EN_DELAY);
   	msleep(msdelay);
@@ -138,10 +140,10 @@ static int lcd_send_data(struct i2c_client *client, u8 data)
   	int ret = 0;
   	mutex_lock(&lcd16x2_mutex);
   	lcd_data = data;
-  	d = (data & 0xF0) | LCD_RS | (LCD_BL) ;
+  	d = (data & 0xF0) | LCD_RS | (backlightFlag == 1 ? LCD_BL : 0x00);
   	lcd_i2c_write_byte(client, &d);
   	lcd_en_strobe(client, STROBE_EN_DELAY);
-  	d = (data << 4) | LCD_RS | (LCD_BL) ;
+  	d = (data << 4) | LCD_RS | (backlightFlag == 1 ? LCD_BL : 0x00);
   	lcd_i2c_write_byte(client, &d);
  	lcd_en_strobe(client, STROBE_EN_DELAY);
   	mutex_unlock(&lcd16x2_mutex);
@@ -169,7 +171,7 @@ static void lcd_puts(struct i2c_client *client, const char *string,
 }
 
 static int lcd_init(struct i2c_client *client){
-  	BYTE msg[15] = {"Chandan JHA ..."};
+  	BYTE msg[15] = {"WELCOME .!"};
   	int displayshift 	= (LCD_CURSORMOVE | LCD_MOVERIGHT);
   	int displaymode 	= (LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT);
   	int displaycontrol 	= (LCD_DISPLAYON | LCD_CURSOROFF | LCD_BLINKOFF);
@@ -190,7 +192,6 @@ static int lcd_init(struct i2c_client *client){
 static void lcd_clear(struct i2c_client *client){
   lcd_send_cmd(client, LCD_CLEARDISPLAY , CLEAR_DELAY);
 }
-
 
 static ssize_t I2c_LCD_clear_data(struct kobject *kobj, struct kobj_attribute *attr, 
 			const char *buf, size_t count)
@@ -216,12 +217,36 @@ static ssize_t I2c_LCD_print_data(struct kobject *kobj, struct kobj_attribute *a
 	lcd_puts(&prv->client_prv, d, 1, 0, count);
 	return count;
 }
+
+static ssize_t I2c_LCD_light_off(struct kobject *kobj, struct kobj_attribute *attr, 
+					const char *buf, size_t count)
+{
+	int ret,d;
+	BYTE data; 
+        ret = sscanf(buf,"%d\n",&d);
+	if(ret < 0 || d < 0 || d > 1)
+                return -EINVAL;
+        if(d)
+             backlightFlag = 0x01;
+	else
+	     backlightFlag = 0x00;
+
+  	data = (backlightFlag == 1 ? LCD_BL : 0x00);
+  	
+	mutex_lock(&lcd16x2_mutex);
+  	i2c_master_send(&prv->client_prv, &data, 1);
+  	mutex_unlock(&lcd16x2_mutex);
+        return count;
+}
+
 static struct kobj_attribute lcd_print_data  = __ATTR(Print_Date, 0220,NULL,I2c_LCD_print_data);
 static struct kobj_attribute lcd_clear_data  = __ATTR(Clear_Date, 0220,NULL,I2c_LCD_clear_data);
+static struct kobj_attribute lcd_light_off   = __ATTR(LIght_off, 0220,NULL,I2c_LCD_light_off);
 
 static struct attribute *attrs[] = {
         &lcd_print_data.attr,
         &lcd_clear_data.attr,
+        &lcd_light_off.attr,
         NULL,
 };
 
@@ -287,3 +312,5 @@ MODULE_DESCRIPTION("Driver for 16x2 lcd display via I2C protocol");
 MODULE_AUTHOR("Chandan jha <beingchandanjha@gmail.com>");
 MODULE_LICENSE("GPL");
 MODULE_VERSION(".1");
+
+
