@@ -185,13 +185,20 @@ static int lcd_init(struct i2c_client *client){
   	//lcd_send_cmd(client, LCD_RETURNHOME , COMMAND_INIT_DELAY);
   	lcd_send_cmd(client, LCD_RETURNHOME , COMMAND_INIT_DELAY);
 
-  	lcd_puts(client, msg, 1, 0, 15);
+  	lcd_puts(client, msg, 1, 0, 11);
   	return 0;
 }
-
 static void lcd_clear(struct i2c_client *client){
   lcd_send_cmd(client, LCD_CLEARDISPLAY , CLEAR_DELAY);
 }
+
+int lcd_exported_print(const char *string,u8 line,u8 col, u8 count)
+{
+	lcd_clear(&prv->client_prv);
+	lcd_puts(&prv->client_prv,string, 1, 0, 15);
+	return 0;
+}
+
 
 static ssize_t I2c_LCD_clear_data(struct kobject *kobj, struct kobj_attribute *attr, 
 			const char *buf, size_t count)
@@ -277,6 +284,7 @@ static int I2c_LCD_probe(struct i2c_client *client,
 static int I2c_LCD_remove(struct i2c_client *client)
 {
 	pr_info("I2c_LCD_remove\n");
+	lcd_clear(&prv->client_prv);
 	kfree(prv);
 	kobject_put(prv->I2c_LCD_kobj);
 	return 0;
@@ -307,6 +315,7 @@ static struct i2c_driver I2c_LCD_drv = {
  */
 module_i2c_driver(I2c_LCD_drv);
 
+EXPORT_SYMBOL_GPL(lcd_exported_print);
 
 MODULE_DESCRIPTION("Driver for 16x2 lcd display via I2C protocol");
 MODULE_AUTHOR("Chandan jha <beingchandanjha@gmail.com>");

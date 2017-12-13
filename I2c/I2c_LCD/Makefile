@@ -1,4 +1,5 @@
 obj-m := i2cLCD_drv.o
+obj-m += LCDprint.o
 
 KDIR =  /home/elinux/linux-4.4.96
 
