@@ -1,0 +1,10 @@
+&i2c2 {
+        status = "okay";
+
+        /*Node for LCD Controller PCF8574T I2c*/
+        PCF8574T_I2c : PCF8574T@27 {
+                compatible = "PCF8574T";
+                reg = <0x27>;
+        };
+};
+
