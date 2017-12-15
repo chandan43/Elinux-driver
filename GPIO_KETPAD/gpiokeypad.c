@@ -38,6 +38,188 @@ struct matrix_keypad {
 	bool gpio_all_disabled;
 };
 
+/*
+ * NOTE: normally the GPIO has to be put into HiZ when de-activated to cause
+ * minmal side effect when scanning other columns, here it is configured to
+ * be input, and it should work on most platforms.
+ */
+static void __activate_col(const struct matrix_keypad_platform_data *pdata,
+			   int col, bool on)
+{
+	bool level_on = !pdata->active_low;
+
+	if (on) {
+		gpio_direction_output(pdata->col_gpios[col], level_on);
+	} else {
+		gpio_set_value_cansleep(pdata->col_gpios[col], !level_on);
+		gpio_direction_input(pdata->col_gpios[col]);
+	}
+}
+
+static void activate_col(const struct matrix_keypad_platform_data *pdata,
+			 int col, bool on)
+{
+	__activate_col(pdata, col, on);
+
+	if (on && pdata->col_scan_delay_us)
+		udelay(pdata->col_scan_delay_us);
+}
+
+static void activate_all_cols(const struct matrix_keypad_platform_data *pdata,
+			      bool on)
+{
+	int col;
+
+	for (col = 0; col < pdata->num_col_gpios; col++)
+		__activate_col(pdata, col, on);
+}
+
+
+static bool row_asserted(const struct matrix_keypad_platform_data *pdata,
+			 int row)
+{
+	return gpio_get_value_cansleep(pdata->row_gpios[row]) ?
+			!pdata->active_low : pdata->active_low;
+}
+
+static void enable_row_irqs(struct matrix_keypad *keypad)
+{
+	const struct matrix_keypad_platform_data *pdata = keypad->pdata;
+	int i;
+
+	if (pdata->clustered_irq > 0)
+		enable_irq(pdata->clustered_irq);
+	else {
+		for (i = 0; i < pdata->num_row_gpios; i++)
+			enable_irq(gpio_to_irq(pdata->row_gpios[i]));
+	}
+}
+
+static void disable_row_irqs(struct matrix_keypad *keypad)
+{
+	const struct matrix_keypad_platform_data *pdata = keypad->pdata;
+	int i;
+
+	if (pdata->clustered_irq > 0)
+		disable_irq_nosync(pdata->clustered_irq);
+	else {
+		for (i = 0; i < pdata->num_row_gpios; i++)
+			disable_irq_nosync(gpio_to_irq(pdata->row_gpios[i]));
+	}
+}
+
+/*
+ * This gets the keys from keyboard and reports it to input subsystem
+ */
+static void matrix_keypad_scan(struct work_struct *work)
+{
+	struct matrix_keypad *keypad =
+		container_of(work, struct matrix_keypad, work.work);
+	struct input_dev *input_dev = keypad->input_dev;
+	const unsigned short *keycodes = input_dev->keycode;
+	const struct matrix_keypad_platform_data *pdata = keypad->pdata;
+	uint32_t new_state[MATRIX_MAX_COLS];
+	int row, col, code;
+	/* de-activate all columns for scanning */
+	activate_all_cols(pdata, false);   //TODO
+	
+	memset(new_state, 0, sizeof(new_state));
+	
+	/* assert each column and read the row status out */
+	for (col = 0; col < pdata->num_col_gpios; col++) {
+
+		activate_col(pdata, col, true);
+
+		for (row = 0; row < pdata->num_row_gpios; row++)
+			new_state[col] |=
+				row_asserted(pdata, row) ? (1 << row) : 0;
+
+		activate_col(pdata, col, false);
+	}
+
+	for (col = 0; col < pdata->num_col_gpios; col++) {
+		uint32_t bits_changed;
+
+		bits_changed = keypad->last_key_state[col] ^ new_state[col];
+		if (bits_changed == 0) // NO change
+			continue;
+
+		for (row = 0; row < pdata->num_row_gpios; row++) {
+			if ((bits_changed & (1 << row)) == 0)
+				continue;
+
+			code = MATRIX_SCAN_CODE(row, col, keypad->row_shift);
+			input_event(input_dev, EV_MSC, MSC_SCAN, code);
+			input_report_key(input_dev,
+					 keycodes[code],
+					 new_state[col] & (1 << row));
+		}
+	}
+	input_sync(input_dev);
+
+	memcpy(keypad->last_key_state, new_state, sizeof(new_state));
+	
+	activate_all_cols(pdata, true); 
+	
+	/* Enable IRQs again */
+	spin_lock_irq(&keypad->lock);
+	keypad->scan_pending = false;
+	enable_row_irqs(keypad);
+	spin_unlock_irq(&keypad->lock);
+}
+
+static irqreturn_t matrix_keypad_interrupt(int irq, void *id)
+{
+	struct matrix_keypad *keypad = id;
+	unsigned long flags;
+
+	spin_lock_irqsave(&keypad->lock, flags);
+	/*
+	 * See if another IRQ beaten us to it and scheduled the
+	 * scan already. In that case we should not try to
+	 * disable IRQs again.
+	 */
+	if (unlikely(keypad->scan_pending || keypad->stopped))
+		goto out;
+	disable_row_irqs(keypad); //TODO
+	keypad->scan_pending = true;
+	/*schedule BH (delayed_work)*/
+	schedule_delayed_work(&keypad->work,
+		msecs_to_jiffies(keypad->pdata->debounce_ms));
+out:
+	spin_unlock_irqrestore(&keypad->lock, flags);
+	return IRQ_HANDLED;
+}
+
+static int matrix_keypad_start(struct input_dev *dev)
+{
+	struct matrix_keypad *keypad = input_get_drvdata(dev);
+
+	keypad->stopped = false;
+	mb();
+
+	/*
+	 * Schedule an immediate key scan to capture current key state;
+	 * columns will be activated and IRQs be enabled after the scan.
+	 */
+	schedule_delayed_work(&keypad->work, 0);
+
+	return 0;
+}
+static void matrix_keypad_stop(struct input_dev *dev)
+{
+	struct matrix_keypad *keypad = input_get_drvdata(dev);
+
+	keypad->stopped = true;
+	mb();
+	flush_work(&keypad->work.work);
+	/*
+	 * matrix_keypad_scan() will leave IRQs enabled;
+	 * we should disable them now.
+	 */
+	disable_row_irqs(keypad);	
+}
+
 #ifdef CONFIG_PM_SLEEP
 static void matrix_keypad_enable_wakeup(struct matrix_keypad *keypad)
 {
