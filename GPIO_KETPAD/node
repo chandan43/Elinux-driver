@@ -47,4 +47,40 @@ Example:
 				0x0101001C
 				0x0201006C>;
 	};
+#node entry for 4 * 4 keypad
+/ {
+	matrix-keypad {
+			compatible = "gpio-matrix-keypad";
+			debounce-delay-ms = <5>;
+			col-scan-delay-us = <2>;
+			keypad,num-rows = <4>;
+			keypad,num-columns = <4>;
 
+			row-gpios = <&gpio0 27 0
+			             &gpio1 29 0
+				     &gpio1 12 0
+				     &gpio2 1 0>;
+
+			col-gpios = <&gpio0 26 0
+				     &gpio1 13 0
+				     &gpio1 14 0
+				     &gpio1 15 0>;
+
+			linux,keymap = <0x00000001
+					0x01000004
+					0x02000007
+					0x0300000E
+					0x00010002
+                                        0x01010005
+                                        0x02010008
+                                        0x03010000
+					0x00020003
+                                        0x01020006
+                                        0x02020009
+                                        0x0302000F
+					0x0003000A
+                                        0x0103000B
+                                        0x0203000C
+                                        0x0303000D>;
+	};
+};

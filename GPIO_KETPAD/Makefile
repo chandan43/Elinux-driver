@@ -1,5 +1,8 @@
-obj-m := matrix_keypad.o
+#obj-m := matrix_keypad.o
 obj-m += matrix-keymap.o
+#obj-m += gpiokeypad.o
+obj-m += gpiokeypad_LCD.o
+obj-m += i2cLCD_drv.o
 
 KDIR =  /home/elinux/linux-4.4.96
 

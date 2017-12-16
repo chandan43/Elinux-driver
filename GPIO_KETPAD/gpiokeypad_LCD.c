@@ -6,6 +6,7 @@
 #include <linux/irq.h>
 #include <linux/interrupt.h>
 #include <linux/jiffies.h>
+#include <linux/init.h>
 
 #include <linux/input/matrix_keypad.h>
 
@@ -15,6 +16,9 @@
 #include <linux/of_gpio.h>
 #include <linux/of_platform.h>
 
+/*Print on lcd*/
+extern int lcd_exported_print(const char *,u8,u8,u8 );
+static bool printnumber;
 /* 
 	DECLARE_BITMAP(name,bits);
 	internally define as unsigned long name[BITS_TO_LONGS(bits)]
@@ -107,7 +111,15 @@ static void disable_row_irqs(struct matrix_keypad *keypad)
 			disable_irq_nosync(gpio_to_irq(pdata->row_gpios[i]));
 	}
 }
-
+/*print data on lcd : i2cLCD_drv.ko module need to run this driver*/
+static void print_data_on_lcd(int lcddata)
+{
+	char str[10];
+	printnumber = false ;
+	pr_info("d=%d\n",lcddata);
+	sprintf(str, "%d", lcddata);
+	lcd_exported_print(str,1,0,2);
+}
 /*
  * This gets the keys from keyboard and reports it to input subsystem
  */
@@ -120,9 +132,11 @@ static void matrix_keypad_scan(struct work_struct *work)
 	const struct matrix_keypad_platform_data *pdata = keypad->pdata;
 	uint32_t new_state[MATRIX_MAX_COLS];
 	int row, col, code;
+	int lcddata;
+	printnumber = true;
 	/* de-activate all columns for scanning */
 	activate_all_cols(pdata, false);   //TODO
-	
+
 	memset(new_state, 0, sizeof(new_state));
 	
 	/* assert each column and read the row status out */
@@ -153,10 +167,16 @@ static void matrix_keypad_scan(struct work_struct *work)
 			input_report_key(input_dev,
 					 keycodes[code],
 					 new_state[col] & (1 << row));
+			lcddata = keycodes[code];
 		}
+		/*Print on lcd*/
+		if(printnumber)
+			print_data_on_lcd(lcddata);
 	}
-	input_sync(input_dev);
 
+	input_sync(input_dev);
+	
+//	ret = lcd_exported_print("A",1,0,4);
 	memcpy(keypad->last_key_state, new_state, sizeof(new_state));
 	
 	activate_all_cols(pdata, true); 
@@ -563,7 +583,7 @@ static int matrix_keypad_probe(struct platform_device *pdev)
 	struct matrix_keypad *keypad; 	/*Private structure*/
 	struct input_dev *input_dev;
 	int err;
-	
+		
 	/*Get platform data*/
 	pdata = dev_get_platdata(&pdev->dev);
 	if(!pdata) {  /* No platform data*/
@@ -688,5 +708,5 @@ module_platform_driver(matrix_keypad_driver);
 
 MODULE_AUTHOR("Chandan Jha <beingchandanjha@gmail.com>");
 MODULE_DESCRIPTION("GPIO Driven Matrix Keypad Driver, Depends on  ");
-MODULE_LICENSE("GPL v2");
+MODULE_LICENSE("GPL");
 MODULE_ALIAS("platform:matrix-keypad");

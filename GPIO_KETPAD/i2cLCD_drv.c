@@ -195,7 +195,7 @@ static void lcd_clear(struct i2c_client *client){
 int lcd_exported_print(const char *string,u8 line,u8 col, u8 count)
 {
 	lcd_clear(&prv->client_prv);
-	lcd_puts(&prv->client_prv,string, 1, 0, 15);
+	lcd_puts(&prv->client_prv,string, 1, 0, count);
 	return 0;
 }
 
